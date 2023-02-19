@@ -199,6 +199,56 @@ function calc_mirrored_tangents() {
 
 function calc_aligned_tangents() {
 	/*re-arranges the points so that the splines are C0 continuous (aligned)*/
+	var newPoints = [];
+	if (canvasPoints.length > 4) {
+		for (i = 3; i < canvasPoints.length; i += 3) {
+
+			var pre = canvasPoints[i-1];
+			var cur = canvasPoints[i];
+
+			if (i == canvasPoints.length -1) {
+				newPoints.push(pre, cur);
+				break;
+			}
+
+			var suc = canvasPoints[i+1];
+
+			// get the distance of pre to cur
+			var dist = [Math.abs(cur[0]-pre[0]), Math.abs(cur[1]-pre[1])];
+			
+			// calculate new successor
+			if (dist[0] < dist[1]) {
+				// move in x direction
+				var y_fac = Math.floor(dist[0] * Math.abs(suc[1]-cur[1])/dist[1]);
+				if (cur[0] > pre[0]) {
+					suc[0] = cur[0] + y_fac;
+				}
+				else {
+					suc[0] = cur[0] - y_fac;
+				}
+			}
+			else {
+				// move in y direction
+				var x_fac = Math.floor(dist[1] * Math.abs(suc[0]-cur[0])/dist[0]);
+				if (cur[1] > pre[1]) {
+					suc[1] = cur[1] + x_fac;
+				}
+				else {
+					suc[1] = cur[1] - x_fac;
+				}
+			}
+
+			newPoints.push(pre, cur, suc);
+		}
+	}
+
+	while (canvasPoints.length > 2) {
+		canvasPoints.pop();
+	}
+	while (newPoints.length > 0) {
+		var pt = newPoints.shift();
+		canvasPoints.push(pt);
+	}
 }
 
 function calc_velocity() {
