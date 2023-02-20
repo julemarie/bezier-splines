@@ -4,15 +4,11 @@ let MODE = modes[0];
 
 const velocityData = [];
 const velocityLayout = {
-	xaxis: {range: [0,1]},
-	yaxis: {range: [0, 1]},
 	title: "Velocity"
 }
 
 const accelerationData = [];
 const accelerationLayout = {
-	xaxis: {range: [0, 1]},
-	yaxis: {range: [0, 1]},
 	title: "Acceleration"
 }
 
@@ -37,6 +33,7 @@ function resetCanvas() {
 	//empty the points array
 	canvasPoints.length = 0;
 	velocityData.length = 0;
+	accelerationData.length = 0;
 
 	// remove all drawings
 	clearCanvas();
@@ -49,7 +46,8 @@ function clearCanvas() {
 	ctx.clearRect(0, 0, cv.width, cv.height);
 
 	// empty the velocity and acceleration plots
-	updatePlots();
+	Plotly.plot("velocityPlot", [], velocityLayout);
+	Plotly.plot("accelerationPlot", [], accelerationLayout);
 }
 
 /*broken continuity button*/
@@ -162,31 +160,47 @@ function draw_tangents() {
 
 function draw_velocity() {
 	/*updates the velocity plot based on calc_velocity*/
+	velocityData.length = 0;
 	for (var i = 3; i <= canvasPoints.length; i+=3) {
 		var b = [canvasPoints[i-3], canvasPoints[i-2], canvasPoints[i-1], canvasPoints[i]];
 		var velocity = get_velocity_points(b, 3);
+		var xData = [];
+		var yData = [];
+		for (var j = 0; j < velocity.length; j++) {
+			xData.push(velocity[j][0]);
+			yData.push(velocity[j][1]);
+		}
+			
 		var data = {
-			x: velocity[0],
-			y: velocity[1],
+			x: xData,
+			y: yData,
 			mode:"lines"
 		};
 		velocityData.push(data);
-		Plotly.newPlot("velocityPlot", velocityData);
+		Plotly.newPlot("velocityPlot", velocityData, velocityLayout);
 	}
 }
 
 function draw_acceleration() {
 	/*updates the acceleration plot based on calc_acceleration*/
+	accelerationData.length = 0;
 	for (var i = 3; i <= canvasPoints.length; i+=3) {
 		var b = [canvasPoints[i-3], canvasPoints[i-2], canvasPoints[i-1], canvasPoints[i]];
 		var acceleration = get_acceleration_points(b, 3);
+		var xData = [];
+		var yData = [];
+		for (var j = 0; j < acceleration.length; j ++) {
+			xData.push(acceleration[j][0]);
+			yData.push(acceleration[j][1]);
+		}
+
 		var data = {
 			x: acceleration[0],
 			y: acceleration[1],
 			mode: "lines"
 		};
 		accelerationData.push(data);
-		Plotly.newPlot("accelerationPlot", accelerationData);
+		Plotly.newPlot("accelerationPlot", accelerationData, accelerationLayout);
 	}
 }
 
@@ -288,10 +302,10 @@ function get_velocity_points(b, n) {
 	var xData = [];
 	var yData = [];
 	for (var t = 0; t <= 1.01; t += 0.01) {
-		xData.push(t);
+		//xData.push(t);
 		yData.push(calc_velocity(b, t, n));
 	}
-	return [xData, yData];
+	return yData;//[xData, yData];
 }
 
 function calc_velocity(b, t, n) {
@@ -313,10 +327,10 @@ function get_acceleration_points(b, n) {
 	var xData = [];
 	var yData = [];
 	for (var t = 0; t <= 1.01; t += 0.01) {
-		xData.push(t);
+		//xData.push(t);
 		yData.push(calc_acceleration(b, t, n));
 	}
-	return [xData, yData];
+	return yData;//[xData, yData];
 }
 
 function calc_acceleration(b, t, n) {

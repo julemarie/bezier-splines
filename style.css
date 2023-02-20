@@ -11,17 +11,15 @@
 /*plots*/
 
 .main-plot{
-	grid-column-start: 1;
-	grid-column-end: 4;
+	grid-column: 2;
 	grid-row-start: 2;
 	grid-row-end: 4;
 	border: 1px solid black;
-	width: 700;
-	height: 450;
+
 }
 
 .velocity{
-	grid-column: 4;
+	grid-column: 1;
 	grid-row: 2;
 	width: 350px;
 	height: 350px;
@@ -34,7 +32,7 @@
 }
 
 .acceleration{
-	grid-column: 4;
+	grid-column: 1;
 	grid-row: 3;
 	width: 350px;
 	height: 350px;
@@ -43,7 +41,7 @@
 /*buttons and more*/
 
 .clear-canvas{
-	grid-column: 1;
+	grid-column: 2;
 	grid-row: 1;
 
 }
@@ -51,7 +49,7 @@
 .continuity-modes {
 	display: flex;
 	justify-content: space-evenly;
-	grid-column: 4;
+	grid-column: 1;
 	grid-row: 1;
 }
 
