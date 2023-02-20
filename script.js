@@ -206,8 +206,8 @@ function draw_acceleration() {
 		}
 
 		var data = {
-			x: acceleration[0],
-			y: acceleration[1],
+			x: xData,
+			y: yData,
 			mode: "lines",
 			line: {
 				color: canvasPoint_Colors[i]
