@@ -1,4 +1,6 @@
 const canvasPoints = [];
+const canvasPoint_Colors = [];
+
 const modes = ["BROKEN", "ALIGN", "MIRROR"];
 let MODE = modes[0];
 
@@ -104,8 +106,11 @@ function getPoint(event) {
 	// if enough points: draw bezier curve
 	l = canvasPoints.length;
 	if(l >= 4 && (l-1) % 3 == 0) {
+		//TODO: match trace color to curve
+		var color = 'rgb(' + Math.floor(Math.random() * 256).toString() + ', ' + Math.floor(Math.random() * 256).toString() + ', ' + Math.floor(Math.random() * 256).toString() + ')';
+		canvasPoint_Colors.push(color, color, color, color);
 		brokenContinuity();
-		draw_bezier_curve(ctx, canvasPoints[l-2], canvasPoints[l-3], canvasPoints[l-4], canvasPoints[l-1]);
+		draw_bezier_curve(ctx, canvasPoints[l-2], canvasPoints[l-3], canvasPoints[l-4], canvasPoints[l-1], l-1);
 		updatePlots();
 	}
 }
@@ -126,14 +131,17 @@ function updatePlots() {
 	draw_acceleration();
 }
 
-function draw_bezier_curve(ctx, pt1, pt2, pt3, pt4) {
+function draw_bezier_curve(ctx, pt1, pt2, pt3, pt4, index) {
+	console.log(canvasPoint_Colors);
 	//draw curve
 	ctx.lineWidth = 3;
 	ctx.moveTo(pt4[0], pt4[1]);
+	ctx.strokeStyle = canvasPoint_Colors[index];
 	ctx.bezierCurveTo(pt1[0], pt1[1], pt2[0], pt2[1], pt3[0], pt3[1]);
 	ctx.stroke();
 
 	//draw splines
+	ctx.strokeStyle = '#000000';
 	ctx.lineWidth = 1;
 	ctx.lineTo(pt2[0], pt2[1]);
 
@@ -152,7 +160,7 @@ function draw_tangents() {
 	for (var i = 0; i < canvasPoints.length; i++) {
 		drawPoint(ctx, canvasPoints[i][0], canvasPoints[i][1]);
 		if (i >= 3 && i % 3 == 0) {
-			draw_bezier_curve(ctx, canvasPoints[i-1], canvasPoints[i-2], canvasPoints[i-3], canvasPoints[i]);
+			draw_bezier_curve(ctx, canvasPoints[i-1], canvasPoints[i-2], canvasPoints[i-3], canvasPoints[i], i);
 		}
 	}
 
@@ -174,7 +182,10 @@ function draw_velocity() {
 		var data = {
 			x: xData,
 			y: yData,
-			mode:"lines"
+			mode:"lines",
+			line: {
+				color: canvasPoint_Colors[i]
+			}
 		};
 		velocityData.push(data);
 		Plotly.newPlot("velocityPlot", velocityData, velocityLayout);
@@ -197,7 +208,10 @@ function draw_acceleration() {
 		var data = {
 			x: acceleration[0],
 			y: acceleration[1],
-			mode: "lines"
+			mode: "lines",
+			line: {
+				color: canvasPoint_Colors[i]
+			}
 		};
 		accelerationData.push(data);
 		Plotly.newPlot("accelerationPlot", accelerationData, accelerationLayout);
@@ -299,13 +313,12 @@ function calc_aligned_tangents() {
 
 function get_velocity_points(b, n) {
 	/*Return the points to draw a velocity plot*/
-	var xData = [];
-	var yData = [];
+	var data = [];
 	for (var t = 0; t <= 1.01; t += 0.01) {
 		//xData.push(t);
-		yData.push(calc_velocity(b, t, n));
+		data.push(calc_velocity(b, t, n));
 	}
-	return yData;//[xData, yData];
+	return data;
 }
 
 function calc_velocity(b, t, n) {
@@ -324,13 +337,11 @@ function calc_velocity(b, t, n) {
 }
 
 function get_acceleration_points(b, n) {
-	var xData = [];
-	var yData = [];
+	var data = [];
 	for (var t = 0; t <= 1.01; t += 0.01) {
-		//xData.push(t);
-		yData.push(calc_acceleration(b, t, n));
+		data.push(calc_acceleration(b, t, n));
 	}
-	return yData;//[xData, yData];
+	return data;
 }
 
 function calc_acceleration(b, t, n) {
