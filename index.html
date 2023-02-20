@@ -2,6 +2,7 @@
 <html>
 <head>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script type="text/javascript" src="script.js"></script>
 
 </head>
@@ -21,13 +22,15 @@
   		onclick="resetCanvas()">
   		clear
   	</button>  
-  	<div class="velocity">
-  		<p>VELOCITY</p>
-  		<canvas class="plot"></canvas>
+  	<div 
+		class="velocity"
+		id="velocityPlot"
+		>
   	</div>
-  	<div class="acceleration">
-  		<p>ACCELERATION</p>
-  		<canvas class="plot"></canvas>
+  	<div 
+		class="acceleration"
+		id="accelerationPlot"
+		>
   	</div>
   	<div class="continuity-modes">
   		<button 

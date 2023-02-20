@@ -23,7 +23,8 @@
 .velocity{
 	grid-column: 4;
 	grid-row: 2;
-	width: 100%;
+	width: 350px;
+	height: 350px;
 }
 
 .plot{
@@ -35,7 +36,8 @@
 .acceleration{
 	grid-column: 4;
 	grid-row: 3;
-	width: 100%;
+	width: 350px;
+	height: 350px;
 }
 
 /*buttons and more*/
