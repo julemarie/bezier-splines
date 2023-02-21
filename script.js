@@ -4,6 +4,10 @@ const canvasPoint_Colors = [];
 const modes = ["BROKEN", "ALIGN", "MIRROR"];
 let MODE = modes[0];
 
+const canvasModes = ["draw", "move"];
+let CANVASMODE = canvasModes[0];
+let POINT_INDEX = -1;
+
 const velocityData = [];
 const velocityLayout = {
 	title: "Velocity"
@@ -29,6 +33,27 @@ function init_view(){
 /*
 BUTTON CALLBACKS
 */
+
+/*switch between drawing and moving points */
+function switchCanvasMode() {
+	var b = document.getElementById("canvas-mode");
+	var cv = document.getElementById("plotCanvas");
+	if (CANVASMODE == "draw") {
+		CANVASMODE = canvasModes[1];
+		// change canvas on click to moving points
+		cv.onclick = findPoint;
+		cv.onmousemove = movePoint;
+		// change button text
+		b.textContent = "switch to adding points";
+	} else if (CANVASMODE == "move") {
+		CANVASMODE = canvasModes[0];
+		// change canvas on click to drawing points
+		cv.onclick = getPoint;
+		cv.onmousemove = '';
+		// change button text
+		b.textContent = "switch to moving points";
+	}
+}
 
 /*clear canvas button*/
 function resetCanvas() {
@@ -88,7 +113,56 @@ function mirrorContinuity() {
 CANVAS INTERACTION
 */
 
+/*on mouse down event*/
+function findPoint(event) {
+	var cv = document.getElementById("plotCanvas");
+	let x = event.clientX - cv.getBoundingClientRect().left;
+	let y = event.clientY - cv.getBoundingClientRect().top;
 
+	if (POINT_INDEX < 0) {
+		// if not currently moving a point: try to find point to move
+		for(var i = 0; i < canvasPoints.length; i++) {
+			var cvPt = canvasPoints[i];
+			if (cvPt[0] <= (x+5) && cvPt[0] >= (x-5)
+				&& cvPt[1] <= (y+5) && cvPt[1] >= (y-5)) {
+				POINT_INDEX = i;
+				break;
+			}
+		}
+	}
+	else {
+		// currently moving a point, let point go
+		POINT_INDEX = -1;
+	}
+
+}
+
+/*on mouse move event*/
+function movePoint(event) {
+	if (POINT_INDEX >= 0) {
+		// found a point that can be moved
+		var cv = document.getElementById("plotCanvas");
+		let x = event.clientX - cv.getBoundingClientRect().left;
+		let y = event.clientY - cv.getBoundingClientRect().top;
+		canvasPoints[POINT_INDEX] = [x, y];
+
+		// check according to continuity mode
+		// if broken, can just move the one point, same if first or last two points
+		if (MODE == "ALIGN" && POINT_INDEX > 1 && POINT_INDEX < canvasPoints.length - 2) {
+			calc_aligned_tangents();
+
+		} else if (MODE == "MIRROR" && POINT_INDEX > 1 && POINT_INDEX < canvasPoints.length -2) {
+			calc_mirrored_tangents();
+		}
+
+		// redraw canvas points and Bézier curves
+		draw_tangents();
+		// update velocity and acceleration points
+		updatePlots();
+	}
+}
+
+/*on click event*/
 function getPoint(event) {
 	/* 
 	add a new point and draw it as well as the bézier curve
@@ -132,7 +206,6 @@ function updatePlots() {
 }
 
 function draw_bezier_curve(ctx, pt1, pt2, pt3, pt4, index) {
-	console.log(canvasPoint_Colors);
 	//draw curve
 	ctx.lineWidth = 3;
 	ctx.moveTo(pt4[0], pt4[1]);

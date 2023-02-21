@@ -11,7 +11,8 @@
 /*plots*/
 
 .main-plot{
-	grid-column: 2;
+	grid-column-start: 2;
+	grid-column-end: 4;
 	grid-row-start: 2;
 	grid-row-end: 4;
 	border: 1px solid black;
@@ -43,7 +44,11 @@
 .clear-canvas{
 	grid-column: 2;
 	grid-row: 1;
+}
 
+.canvas-mode {
+	grid-column: 3;
+	grid-row: 1;
 }
 
 .continuity-modes {
